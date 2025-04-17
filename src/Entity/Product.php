@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[AllowDynamicProperties]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -30,7 +32,7 @@ class Product
     private ?int $stock = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $categories = null;
+    private ?array $category = null;
 
     public function getId(): ?int
     {
@@ -97,12 +99,12 @@ class Product
         return $this;
     }
 
-    public function getCategories(): ?array
+    public function getCategory(): ?array
     {
         return $this->categories;
     }
 
-    public function setCategories(?array $categories): static
+    public function setCategory(?array $categories): static
     {
         $this->categories = $categories;
 

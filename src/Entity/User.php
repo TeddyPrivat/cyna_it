@@ -4,9 +4,9 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,7 +25,7 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $adress = null;
 
     #[ORM\Column(length: 255, nullable: true)]
