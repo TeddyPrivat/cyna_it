@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request; 
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 #[Route('/api')]
 final class SignInController extends AbstractController
@@ -42,11 +43,14 @@ final class SignInController extends AbstractController
             'email' => $data['email']
         ]);
 
-        if ($existingUser) {
-            return $this->json([
-                'message' => 'User already exists. Please log in.'
-            ], 409);
-        }
+            if ($existingUser) {
+                // Rediriger sur la route /login
+
+                return $this->json([
+                    'message' => 'User already exists. Please log in.'
+                ], 409)
+                ->redirectToRoute('app_login');
+            }
 
         // Créer le nouvel utilisateur
         $user = new User();
