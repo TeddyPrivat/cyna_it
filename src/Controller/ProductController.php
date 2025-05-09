@@ -18,7 +18,7 @@ final class ProductController extends AbstractController
         foreach($products as $product){
             $data[] = [
                 'id' => $product->getId(),
-                'name' => $product->getTitle(),
+                'title' => $product->getTitle(),
                 'description' => $product->getDescription(),
                 'imgUrl' => $product->getImgUrl(),
                 'price' => $product->getPrice(),
