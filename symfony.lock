@@ -272,28 +272,6 @@
             "./translations/.gitignore"
         ]
     },
-    "symfony/twig-bundle": {
-        "version": "7.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "6.4",
-            "ref": "cab5fd2a13a45c266d45a7d9337e28dee6272877"
-        },
-        "files": [
-            "./config/packages/twig.yaml",
-            "./templates/base.html.twig"
-        ]
-    },
-    "symfony/ux-turbo": {
-        "version": "2.22",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "2.19",
-            "ref": "9dd2778a116b6e5e01e5e1582d03d5a9e82630de"
-        }
-    },
     "symfony/validator": {
         "version": "7.1",
         "recipe": {
@@ -305,21 +283,5 @@
         "files": [
             "./config/packages/validator.yaml"
         ]
-    },
-    "symfony/web-profiler-bundle": {
-        "version": "7.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "6.1",
-            "ref": "e42b3f0177df239add25373083a564e5ead4e13a"
-        },
-        "files": [
-            "./config/packages/web_profiler.yaml",
-            "./config/routes/web_profiler.yaml"
-        ]
-    },
-    "twig/extra-bundle": {
-        "version": "v3.19.0"
     }
 }
