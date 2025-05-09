@@ -18,7 +18,7 @@ final class ServiceController extends AbstractController
         foreach($services as $service){
             $data[] = [
                 'id' => $service->getId(),
-                'name' => $service->getTitle(),
+                'title' => $service->getTitle(),
                 'description' => $service->getDescription(),
                 'price' => $service->getPrice()
                 //Catégorie à ajouter
