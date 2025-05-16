@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ServiceController extends AbstractController
 {
     #[Route('/services', name: 'app_services')]
-    public function index(ServiceRepository $sr): JsonResponse
+    public function getAllServices(ServiceRepository $sr): JsonResponse
     {
         $services = $sr->findAll();
         $data = [];
@@ -25,5 +25,12 @@ final class ServiceController extends AbstractController
             ];
         }
         return $this->json($data);
+    }
+
+    #[Route('/service/{id}', name:'app_service')]
+    public function getServiceById(ServiceRepository $sr, $id): JsonResponse
+    {
+        $service = $sr->find($id);
+        return $this->json($service);
     }
 }
