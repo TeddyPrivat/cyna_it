@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -27,5 +28,12 @@ final class ProductController extends AbstractController
             ];
         }
         return $this->json($data);
+    }
+
+    #[Route('/product/{id}', name: 'app_product', methods: ['GET'])]
+    public function getProductById(ProductRepository $pr, $id): JsonResponse
+    {
+        $product = $pr->find($id);
+        return $this->json($product);
     }
 }

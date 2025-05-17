@@ -101,12 +101,12 @@ class Product
 
     public function getCategory(): ?array
     {
-        return $this->categories;
+        return $this->category;
     }
 
-    public function setCategory(?array $categories): static
+    public function setCategory(?array $category): static
     {
-        $this->categories = $categories;
+        $this->category = $category;
 
         return $this;
     }

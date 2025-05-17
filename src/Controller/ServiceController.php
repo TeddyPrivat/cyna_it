@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 final class ServiceController extends AbstractController
 {
-    #[Route('/services', name: 'app_services')]
+    #[Route('/services', name: 'app_services', methods: ['GET'])]
     public function getAllServices(ServiceRepository $sr): JsonResponse
     {
         $services = $sr->findAll();
@@ -27,7 +27,7 @@ final class ServiceController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/service/{id}', name:'app_service')]
+    #[Route('/service/{id}', name:'app_service', methods: ['GET'])]
     public function getServiceById(ServiceRepository $sr, $id): JsonResponse
     {
         $service = $sr->find($id);
