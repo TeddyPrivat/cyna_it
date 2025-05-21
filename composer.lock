@@ -7983,7 +7983,7 @@
         },
         {
             "name": "doctrine/doctrine-fixtures-bundle",
-            "version": "4.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineFixturesBundle.git",
