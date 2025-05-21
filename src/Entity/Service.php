@@ -26,6 +26,9 @@ class Service
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $category = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $img_url = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Service
     public function setCategory(?array $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getImgUrl(): ?string
+    {
+        return $this->img_url;
+    }
+
+    public function setImgUrl(?string $img_url): static
+    {
+        $this->img_url = $img_url;
 
         return $this;
     }
