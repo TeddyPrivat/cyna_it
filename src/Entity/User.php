@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use http\Env\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,7 +28,7 @@ class User implements PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $adress = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -41,6 +43,17 @@ class User implements PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+//    need update
+    public function eraseCredentials() : void
+    {
+        // vider les données les token JWT
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     public function getFirstname(): ?string
@@ -119,6 +132,12 @@ class User implements PasswordAuthenticatedUserInterface
     {
         return $this->city;
     }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
 
     public function setCity(?string $city): static
     {
