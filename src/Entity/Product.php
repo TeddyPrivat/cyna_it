@@ -32,7 +32,7 @@ class Product
     private ?int $stock = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $category = null;
+    private ?array $categories = null;
 
     public function getId(): ?int
     {
@@ -99,14 +99,14 @@ class Product
         return $this;
     }
 
-    public function getCategory(): ?array
+    public function getCategories(): ?array
     {
-        return $this->category;
+        return $this->categories;
     }
 
-    public function setCategory(?array $category): static
+    public function setCategories(?array $categories): static
     {
-        $this->category = $category;
+        $this->categories = $categories;
 
         return $this;
     }
