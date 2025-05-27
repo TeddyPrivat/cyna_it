@@ -26,7 +26,7 @@ final class ProductController extends AbstractController
                 'imgUrl' => $product->getImgUrl(),
                 'price' => $product->getPrice(),
                 'stock' => $product->getStock(),
-                'category' => $product->getCategory(),
+                //Catégorie sera à rajouter
             ];
         }
         return $this->json($data);
@@ -52,10 +52,10 @@ final class ProductController extends AbstractController
         }
     }
 
-    #[Route('/product/add', name: 'app_add_product', methods: ['POST'])]
-    public function addProduct(ProductRepository $pr, EntityManagerInterface $em): JsonResponse{
-
-//        $product = new Product();
-
-    }
+//    #[Route('/product/add', name: 'app_add_product', methods: ['POST'])]
+//    public function addProduct(ProductRepository $pr, EntityManagerInterface $em): JsonResponse{
+//
+////        $product = new Product();
+//
+//    }
 }
