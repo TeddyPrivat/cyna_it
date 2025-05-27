@@ -40,4 +40,22 @@ class ServiceRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function save(Service $service, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($service);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Service $service, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($service);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

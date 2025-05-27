@@ -40,4 +40,30 @@ class ProductRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+//Uncaught PHP Exception Error: "Non-static method App\Repository\ProductRepository::save() cannot be called statically"
+    /**
+     * Save a Product entity.
+     *
+     * @param Product $product
+     * @param bool $flush Whether to flush the changes immediately
+     */
+    public function save(Product $product, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($product);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Product $product, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($product);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+
 }
