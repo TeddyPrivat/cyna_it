@@ -2,7 +2,7 @@ security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-            algorithm: plaintext
+            "auto"
             #put "auto" instead when the passwords are hashed in bdd
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
@@ -30,9 +30,11 @@ security:
             jwt: ~
 
     access_control:
+        - { path: ^/api/signup, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/users,       roles: IS_AUTHENTICATED_FULLY }
-            # activate different ways to authenticate
+        - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY }
+
+          # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
