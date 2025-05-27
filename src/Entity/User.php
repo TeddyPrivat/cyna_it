@@ -40,6 +40,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Command $command = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +140,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return ['ROLE_USER'];
     }
+    public function setRoles(?string $roles): static
+    {
+        return $this->setRole($roles);
+    }
 
 
     public function setCity(?string $city): static
@@ -159,6 +166,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->command = $command;
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
 
         return $this;
     }

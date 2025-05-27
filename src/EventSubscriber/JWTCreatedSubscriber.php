@@ -12,8 +12,9 @@ class JWTCreatedSubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $payload = $event->getData();
 
-        $payload['nom'] = $user->getLastname();
-        $payload['prenom'] = $user->getFirstname();
+//        $payload['nom'] = $user->getLastname();
+//        $payload['prenom'] = $user->getFirstname();
+        $payload['id'] = $user->getId();
 
         $event->setData($payload);
     }
