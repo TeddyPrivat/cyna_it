@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +26,7 @@ final class ProductController extends AbstractController
                 'imgUrl' => $product->getImgUrl(),
                 'price' => $product->getPrice(),
                 'stock' => $product->getStock(),
-                //Catégorie sera à rajouter
+                'category' => $product->getCategory(),
             ];
         }
         return $this->json($data);
@@ -51,5 +50,12 @@ final class ProductController extends AbstractController
             $em->flush();
             return $this->json(['message' => "Le produit a bien été supprimé"]);
         }
+    }
+
+    #[Route('/product/add', name: 'app_add_product', methods: ['POST'])]
+    public function addProduct(ProductRepository $pr, EntityManagerInterface $em): JsonResponse{
+
+//        $product = new Product();
+
     }
 }
