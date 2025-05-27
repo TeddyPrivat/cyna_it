@@ -40,4 +40,22 @@ class CommandRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+        public function save(Command $command, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($command);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Command $command, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($command);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }
