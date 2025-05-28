@@ -41,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Command $command = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $role = null;
+    private array $role = [];
 
     public function getId(): ?int
     {
@@ -136,11 +136,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->city;
     }
 
-    public function getRoles(): array
-    {
-        return ['ROLE_USER'];
-    }
-    public function setRoles(?string $roles): static
+
+    public function setRoles(array $roles): static
     {
         return $this->setRole($roles);
     }
@@ -169,13 +166,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    public function getRole(): ?string
+    public function getRoles(): array
+    {
+        return $this->getRole();
+    }
+    public function getRole(): array
     {
         return $this->role;
     }
 
-    public function setRole(string $role): static
+    public function setRole(array $role): static
     {
         $this->role = $role;
 

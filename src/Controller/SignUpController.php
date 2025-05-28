@@ -15,10 +15,11 @@ final class SignUpController extends AbstractController
 {
     #[Route('/signup', name: 'app_signup', methods: ['POST'])]
     public function signUp(
-        Request $request,
-        EntityManagerInterface $entityManager,
+        Request                     $request,
+        EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $passwordHasher
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
@@ -50,7 +51,7 @@ final class SignUpController extends AbstractController
         $user->setLastname($lastname);
         $user->setEmail($email);
         $user->setAdress($adress);
-        $user->setRole('ROLE_USER');
+        $user->setRole(['ROLE_USER']);
 
         $hashedPassword = $passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
