@@ -6,6 +6,8 @@ use App\Entity\Command;
 use App\Repository\CartRepository;
 use App\Repository\CommandRepository;
 use App\Repository\UserRepository;
+use App\Repository\ProductRepository;
+use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +21,9 @@ final class CommandController extends AbstractController
         private readonly CommandRepository $commandRepository,
         private readonly CartRepository $cartRepository,
         private readonly UserRepository $userRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ProductRepository $productRepository,
+        private readonly ServiceRepository $serviceRepository
     ) {}
 
     #[Route('/commands', name: 'app_commands', methods: ['GET'])]
@@ -77,16 +81,24 @@ final class CommandController extends AbstractController
             return new JsonResponse(['error' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
         }
 
-        $lastCommand = $this->commandRepository->findOneBy([], ['id' => 'DESC']);
-        $newCommandId = $lastCommand ? $lastCommand->getId() + 1 : 1;
+        // On cherche le dernier commandId (pas id unique) utilisé
+        $lastCommand = $this->commandRepository->findOneBy([], ['commandId' => 'DESC']);
+        $newCommandId = $lastCommand ? $lastCommand->getCommandId() + 1 : 1;
 
         foreach ($cartItems as $cartItem) {
             $command = new Command();
-            $command->setId($newCommandId);
+            $command->setCommandId($newCommandId); // <- ici !
             $command->setUser($user);
             $command->setProduct($cartItem->getProduct());
             $command->setService($cartItem->getService());
             $command->setQuantity($cartItem->getQuantity());
+
+            // Update du stock
+            $product = $cartItem->getProduct();
+            if ($product) {
+                $product->setStock($product->getStock() - $cartItem->getQuantity());
+                $this->entityManager->persist($product);
+            }
 
             $this->entityManager->persist($command);
         }
@@ -97,6 +109,10 @@ final class CommandController extends AbstractController
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Command created successfully', 'command_id' => $newCommandId], Response::HTTP_CREATED);
+        return new JsonResponse([
+            'message' => 'Command created successfully',
+            'command_id' => $newCommandId // <- on retourne le groupement
+        ], Response::HTTP_CREATED);
     }
+
 }

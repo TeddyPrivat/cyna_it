@@ -28,3 +28,6 @@ migrations
 
 
 /migrations/*
+
+
+/config/jwt/*

@@ -9,10 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
 class Command
 {
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'command', cascade: ['persist', 'remove'])]
+    #[ORM\Column(type: 'integer')]
+    private ?int $commandId = null; // Ajouté
+
+    #[ORM\ManyToOne(inversedBy: 'commands')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -25,14 +29,21 @@ class Command
     #[ORM\Column(nullable: true)]
     private ?int $quantity = null;
 
+    // Getters & Setters
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function getCommandId(): ?int
     {
-        $this->id = $id;
+        return $this->commandId;
+    }
+
+    public function setCommandId(int $commandId): static
+    {
+        $this->commandId = $commandId;
         return $this;
     }
 
