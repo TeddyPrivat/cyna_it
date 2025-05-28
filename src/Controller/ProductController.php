@@ -77,48 +77,54 @@ final class ProductController extends AbstractController
         return $this->json(['message' => 'Product deleted successfully']);
     }
 
-    #[Route('/product', name: 'app_product_create', methods: ['POST'])]
-    public function createProduct(Request $request): JsonResponse
-    {
-        $title = $request->query->get('title');
-        $description = $request->query->get('description');
-        $imgUrl = $request->query->get('imgUrl');
-        $price = $request->query->get('price');
-        $stock = $request->query->get('stock');
+#[Route('/product', name: 'app_product_create', methods: ['POST'])]
+public function createProduct(Request $request): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
 
-        if (!$title || !$price || !$stock) {
-            return $this->json([
-                'message' => 'Missing required fields: title, price or stock'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $categoriesParam = $request->query->get('categories');
-
-        if (is_array($categoriesParam)) {
-            // Cas : ?categories=2&categories=3
-            $categoryIds = $categoriesParam;
-        } elseif (is_string($categoriesParam)) {
-            // Cas : ?categories=2,3,4
-            $categoryIds = array_filter(array_map('trim', explode(',', $categoriesParam)));
-        } else {
-            $categoryIds = [];
-        }
-
-        $product = new Product();
-        $product->setTitle($title);
-        $product->setDescription($description);
-        $product->setImgUrl($imgUrl);
-        $product->setPrice((float) $price);
-        $product->setStock((int) $stock);
-        $product->setCategories($categoryIds);
-
-        $this->productRepository->save($product, true);
-
-        return $this->json([
-            'message' => 'Product created successfully',
-            'id' => $product->getId()
-        ], Response::HTTP_CREATED);
+    if (!$data) {
+        return $this->json(['message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
     }
+
+    $title = $data['title'] ?? null;
+    $description = $data['description'] ?? null;
+    $imgUrl = $data['imgUrl'] ?? null;
+    $price = $data['price'] ?? null;
+    $stock = $data['stock'] ?? null;
+
+    if (!$title || !$price || !$stock) {
+        return $this->json([
+            'message' => 'Missing required fields: title, price or stock'
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
+    // 🔁 Gérer les catégories (stockées comme tableau d'IDs, sans jointure)
+    $categoriesParam = $data['categories'] ?? null;
+
+    if (is_array($categoriesParam)) {
+        $categoryIds = $categoriesParam;
+    } elseif (is_string($categoriesParam)) {
+        $categoryIds = array_filter(array_map('trim', explode(',', $categoriesParam)));
+    } else {
+        $categoryIds = [];
+    }
+
+    $product = new Product();
+    $product->setTitle($title);
+    $product->setDescription($description);
+    $product->setImgUrl($imgUrl);
+    $product->setPrice((float) $price);
+    $product->setStock((int) $stock);
+    $product->setCategories($categoryIds); // 👈 Juste les IDs, pas d'entités
+
+    $this->productRepository->save($product, true);
+
+    return $this->json([
+        'message' => 'Product created successfully',
+        'id' => $product->getId()
+    ], Response::HTTP_CREATED);
+}
+
 
 
     
