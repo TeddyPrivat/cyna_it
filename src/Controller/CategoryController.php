@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,4 +49,34 @@ final class CategoryController extends AbstractController
         ]);
     }
 
+    #[Route('/categorie/add', name: 'app_category_add', methods: ['POST'])]
+    public function addCategory(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $category = new Category();
+        $category->setCategoryName($data['categoryName']);
+
+        $em->persist($category);
+        $em->flush();
+
+        return $this->json([
+            'id' => $category->getId(),
+            'categoryName' => $category->getCategoryName(),
+            "message" => "Catégorie crée avec succès",
+        ], 201);
+    }
+
+    #[Route('/categorie/delete/{id}', name: 'app_category_delete', methods: ['DELETE'])]
+    public function deleteCategory($id, EntityManagerInterface $em, CategoryRepository $cr): JsonResponse
+    {
+        $category = $cr->find($id);
+        if (!$category) {
+            return new JsonResponse(['error' => 'Category not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($category);
+        $em->flush();
+
+        return $this->json(["message" => "Le produit a été supprimé avec succès"]);
+    }
 }
