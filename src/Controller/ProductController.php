@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,7 +62,7 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/product/add', name: 'app_add_product', methods: ['POST'])]
-    public function addProduct(EntityManagerInterface $em, Request $request): JsonResponse{
+    public function addProduct(EntityManagerInterface $em, Request $request, CategoryRepository $cr): JsonResponse{
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
@@ -72,6 +73,7 @@ final class ProductController extends AbstractController
         $description = $data['description'];
         $price = $data['price'];
         $stock = $data['stock'];
+        $categories = $data['categories'];
 
         if (!$title || !$description || $price === null || $stock === null) {
             return new JsonResponse(['error' => 'Missing fields'], 400);
@@ -82,6 +84,12 @@ final class ProductController extends AbstractController
         $product->setPrice($price);
         $product->setStock($stock);
         $product->setImgUrl("");
+        foreach ($data['categories'] as $catData) {
+            $category = $cr->find($catData['id']);
+            if ($category) {
+                $product->addCategory($category);
+            }
+        }
 
         $em->persist($product);
         $em->flush();
@@ -94,12 +102,13 @@ final class ProductController extends AbstractController
                 'description' => $product->getDescription(),
                 'price' => $product->getPrice(),
                 'stock' => $product->getStock(),
+                'categories' => $product->getCategories()
             ]
         ], 201);
     }
 
     #[Route('/product/edit/{id}', name: 'app_edit_product', methods: ['PUT'])]
-    public function modifyProduct(int $id, ProductRepository $pr, EntityManagerInterface $em, Request $request): JsonResponse
+    public function modifyProduct(int $id, ProductRepository $pr, EntityManagerInterface $em, Request $request, CategoryRepository $cr): JsonResponse
     {
         $product = $pr->find($id);
         if (!$product) {
@@ -112,6 +121,19 @@ final class ProductController extends AbstractController
         $product->setDescription($data['description'] ?? $product->getDescription());
         $product->setPrice($data['price'] ?? $product->getPrice());
         $product->setStock($data['stock'] ?? $product->getStock());
+
+        //ici on vide ce que contient le produit pour les catégories, car sinon les changements ne sont pas vraiment pris en compte
+        //on récupère les catégories existantes et on en rajoute seulement, en les vidant de base on évite ce problème
+        foreach ($product->getCategories() as $existingCategory) {
+            $product->removeCategory($existingCategory);
+        }
+        //on les remplit avec les nouvelles données
+        foreach ($data['categories'] as $catData) {
+            $category = $cr->find($catData['id']);
+            if ($category) {
+                $product->addCategory($category);
+            }
+        }
 
         $em->persist($product);
         $em->flush();
