@@ -20,6 +20,10 @@ final class ProductController extends AbstractController
         $products = $pr->findAll();
         $data = [];
         foreach($products as $product){
+            $categories = [];
+            foreach ($product->getCategories() as $category) {
+                $categories[] = $category->getCategoryName();
+            }
             $data[] = [
                 'id' => $product->getId(),
                 'title' => $product->getTitle(),
@@ -27,7 +31,7 @@ final class ProductController extends AbstractController
                 'imgUrl' => $product->getImgUrl(),
                 'price' => $product->getPrice(),
                 'stock' => $product->getStock(),
-                //Catégorie sera à rajouter
+                'categories' => $categories
             ];
         }
         return $this->json($data);
@@ -37,7 +41,10 @@ final class ProductController extends AbstractController
     public function getProductById(ProductRepository $pr, $id): JsonResponse
     {
         $product = $pr->find($id);
-        return $this->json($product);
+        if (!$product) {
+            return $this->json(['error' => 'Produit non trouvé'], 404);
+        }
+        return $this->json($product, 200, [], ['groups' => 'product:read']);
     }
 
     #[Route('/product/delete/{id}', name: 'app_delete_product', methods: ['POST'])]
