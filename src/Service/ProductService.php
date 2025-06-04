@@ -2,12 +2,16 @@
 
 namespace App\Service;
 
-use App\Repository\ProductRepository;
 use App\Entity\Product;
+use App\Repository\ProductRepository;
+use App\Repository\CategoryRepository;
 
 class ProductService
 {
-    public function __construct(private readonly ProductRepository $productRepository) {}
+    public function __construct(
+        private readonly ProductRepository $productRepository,
+        private readonly CategoryRepository $categoryRepository
+    ) {}
 
     public function getAllProducts(): array
     {
@@ -15,14 +19,7 @@ class ProductService
         $data = [];
 
         foreach ($products as $product) {
-            $data[] = [
-                'id' => $product->getId(),
-                'title' => $product->getTitle(),
-                'description' => $product->getDescription(),
-                'price' => $product->getPrice(),
-                'imgUrl' => $product->getImgUrl(),
-                'categories' => $product->getCategories()
-            ];
+            $data[] = $this->serializeProduct($product);
         }
 
         return $data;
@@ -36,14 +33,7 @@ class ProductService
             return null;
         }
 
-        return [
-            'id' => $product->getId(),
-            'title' => $product->getTitle(),
-            'description' => $product->getDescription(),
-            'price' => $product->getPrice(),
-            'imgUrl' => $product->getImgUrl(),
-            'categories' => $product->getCategories()
-        ];
+        return $this->serializeProduct($product);
     }
 
     public function createProduct(array $data): array
@@ -53,18 +43,20 @@ class ProductService
         $product->setDescription($data['description']);
         $product->setPrice($data['price']);
         $product->setImgUrl($data['imgUrl']);
-        $product->setCategories($data['categories'] ?? []);
+        $product->setStock($data['stock'] ?? 0);
 
-        $this->productRepository->save($product);
+        if (!empty($data['categories']) && is_array($data['categories'])) {
+            foreach ($data['categories'] as $categoryId) {
+                $category = $this->categoryRepository->find($categoryId);
+                if ($category) {
+                    $product->addCategory($category);
+                }
+            }
+        }
 
-        return [
-            'id' => $product->getId(),
-            'title' => $product->getTitle(),
-            'description' => $product->getDescription(),
-            'price' => $product->getPrice(),
-            'imgUrl' => $product->getImgUrl(),
-            'categories' => $product->getCategories()
-        ];
+        $this->productRepository->save($product, true); // flush = true
+
+        return $this->serializeProduct($product);
     }
 
     public function updateProduct(int $id, array $data): ?array
@@ -87,20 +79,27 @@ class ProductService
         if (isset($data['imgUrl'])) {
             $product->setImgUrl($data['imgUrl']);
         }
-        if (isset($data['categories'])) {
-            $product->setCategories($data['categories']);
+        if (isset($data['stock'])) {
+            $product->setStock($data['stock']);
         }
 
-        $this->productRepository->save($product);
+        if (isset($data['categories']) && is_array($data['categories'])) {
+            // Réinitialiser la collection actuelle
+            foreach ($product->getCategories() as $existingCategory) {
+                $product->removeCategory($existingCategory);
+            }
 
-        return [
-            'id' => $product->getId(),
-            'title' => $product->getTitle(),
-            'description' => $product->getDescription(),
-            'price' => $product->getPrice(),
-            'imgUrl' => $product->getImgUrl(),
-            'categories' => $product->getCategories()
-        ];
+            foreach ($data['categories'] as $categoryId) {
+                $category = $this->categoryRepository->find($categoryId);
+                if ($category) {
+                    $product->addCategory($category);
+                }
+            }
+        }
+
+        $this->productRepository->save($product, true); // flush = true
+
+        return $this->serializeProduct($product);
     }
 
     public function deleteProduct(int $id): bool
@@ -111,7 +110,28 @@ class ProductService
             return false;
         }
 
-        $this->productRepository->remove($product);
+        $this->productRepository->remove($product, true); // flush = true
         return true;
+    }
+
+    private function serializeProduct(Product $product): array
+    {
+        $categories = [];
+        foreach ($product->getCategories() as $category) {
+            $categories[] = [
+                'id' => $category->getId(),
+                'categoryName' => $category->getCategoryName(),
+            ];
+        }
+
+        return [
+            'id' => $product->getId(),
+            'title' => $product->getTitle(),
+            'description' => $product->getDescription(),
+            'price' => $product->getPrice(),
+            'imgUrl' => $product->getImgUrl(),
+            'stock' => $product->getStock(),
+            'categories' => $categories,
+        ];
     }
 }

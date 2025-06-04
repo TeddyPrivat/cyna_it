@@ -16,31 +16,6 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-//Uncaught PHP Exception Error: "Non-static method App\Repository\ProductRepository::save() cannot be called statically"
     /**
      * Save a Product entity.
      *
@@ -56,6 +31,12 @@ class ProductRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Remove a Product entity.
+     *
+     * @param Product $product
+     * @param bool $flush Whether to flush the changes immediately
+     */
     public function remove(Product $product, bool $flush = false): void
     {
         $this->getEntityManager()->remove($product);
@@ -64,6 +45,4 @@ class ProductRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-
 }

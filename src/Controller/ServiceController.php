@@ -2,98 +2,77 @@
 
 namespace App\Controller;
 
-use App\Entity\Service;
-use App\Repository\ServiceRepository;
-use App\Repository\CategoryRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\ServiceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api')]
 final class ServiceController extends AbstractController
 {
-    public function __construct(
-        private readonly ServiceRepository $serviceRepository,
-        private readonly EntityManagerInterface $em
-    ) {}
+    public function __construct(private readonly ServiceService $serviceService) {}
+
     #[Route('/services', name: 'app_services', methods: ['GET'])]
-    public function getAllServices(ServiceRepository $sr): JsonResponse
+    public function getAllServices(): JsonResponse
     {
-        $services = $sr->findAll();
-        $data = [];
-        foreach($services as $service){
-            $data[] = [
-                'id' => $service->getId(),
-                'title' => $service->getTitle(),
-                'description' => $service->getDescription(),
-                'price' => $service->getPrice()
-                //Catégorie à ajouter
-            ];
-        }
-        return $this->json($data);
+        $services = $this->serviceService->getAllServices();
+        return $this->json($services);
     }
 
-    #[Route('/service/{id}', name:'app_service', methods: ['GET'])]
-    public function getServiceById(ServiceRepository $sr, $id): JsonResponse
+    #[Route('/service/{id}', name: 'app_service', methods: ['GET'])]
+    public function getServiceById(int $id): JsonResponse
     {
-        $service = $sr->find($id);
+        $service = $this->serviceService->getServiceById($id);
+
+        if (!$service) {
+            return $this->json(['message' => 'Service not found'], Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($service);
     }
 
-    #[Route('/service/{id}', name: 'app_service_delete', methods: ['DELETE'])]
-    public function deleteService(int $id): JsonResponse
-    {
-        $service = $this->serviceRepository->find($id);
-
-        if (!$service) {
-            return $this->json(['message' => 'service not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        $this->em->remove($service);
-        $this->em->flush();
-
-        return $this->json(['message' => 'service deleted successfully']);
-    }
-
-    #[Route('/service', name: 'app_service_create', methods: ['POST'])]
+    #[Route('/service', name: 'app_create_service', methods: ['POST'])]
     public function createService(Request $request): JsonResponse
     {
-        $title = $request->query->get('title');
-        $description = $request->query->get('description');
-        $price = $request->query->get('price');
+        $data = json_decode($request->getContent(), true);
 
-        if (!$title || !$price) {
-            return $this->json([
-                'message' => 'Missing required fields: title or price'
-            ], Response::HTTP_BAD_REQUEST);
+        if (!$data) {
+            return $this->json(['message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
         }
 
-        $categoryParam = $request->query->get('category');
+        $service = $this->serviceService->createService($data);
+        return $this->json($service, Response::HTTP_CREATED);
+    }
 
-        if (is_array($categoryParam)) {
-            // Cas : ?category=2&category=3
-            $categoryIds = $categoryParam;
-        } elseif (is_string($categoryParam)) {
-            // Cas : ?category=2,3,4
-            $categoryIds = array_filter(array_map('trim', explode(',', $categoryParam)));
-        } else {
-            $categoryIds = [];
+    #[Route('/service/{id}', name: 'app_update_service', methods: ['PUT', 'PATCH'])]
+    public function updateService(int $id, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
         }
 
-        $service = new Service();
-        $service->setTitle($title);
-        $service->setDescription($description);
-        $service->setPrice((float) $price);
-        $service->setCategory($categoryIds);
+        $service = $this->serviceService->updateService($id, $data);
 
-        $this->serviceRepository->save($service, true);
+        if (!$service) {
+            return $this->json(['message' => 'Service not found'], Response::HTTP_NOT_FOUND);
+        }
 
-        return $this->json([
-            'message' => 'service created successfully',
-            'id' => $service->getId()
-        ], Response::HTTP_CREATED);
+        return $this->json($service);
+    }
+
+    #[Route('/service/{id}', name: 'app_delete_service', methods: ['DELETE'])]
+    public function deleteService(int $id): JsonResponse
+    {
+        $deleted = $this->serviceService->deleteService($id);
+
+        if (!$deleted) {
+            return $this->json(['message' => 'Service not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json(['message' => 'Service deleted successfully']);
     }
 }
