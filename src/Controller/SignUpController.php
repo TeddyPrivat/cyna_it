@@ -51,7 +51,7 @@ final class SignUpController extends AbstractController
         $user->setLastname($lastname);
         $user->setEmail($email);
         $user->setAdress($adress);
-        $user->setRole(['ROLE_USER']);
+        $user->setRoles(['ROLE_USER']);
 
         $hashedPassword = $passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
