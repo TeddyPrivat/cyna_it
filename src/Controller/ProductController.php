@@ -75,4 +75,16 @@ final class ProductController extends AbstractController
 
         return $this->json(['message' => 'Product deleted successfully']);
     }
+
+    #[Route('/product/{id}/stock', name: 'app_product_stock', methods: ['GET'])]
+    public function getProductStock(int $id): JsonResponse
+    {
+        $stock = $this->productService->getProductStock($id);
+
+        if ($stock === null) {
+            return $this->json(['message' => 'Product not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json(['stock' => $stock]);
+    }
 }

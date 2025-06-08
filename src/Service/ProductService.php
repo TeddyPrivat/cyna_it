@@ -114,6 +114,17 @@ class ProductService
         return true;
     }
 
+    public function getProductStock(int $id): ?int
+    {
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            return null;
+        }
+
+        return $product->getStock();
+    }
+
     private function serializeProduct(Product $product): array
     {
         $categories = [];
