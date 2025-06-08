@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +12,6 @@ final class UserController extends AbstractController
 {
     public function __construct(private readonly UserService $userService) {}
 
-    // Route pour récupérer tous les utilisateurs
     #[Route('/users', name: 'app_user_list', methods: ['GET'])]
     public function getAllUsers(): Response
     {
@@ -21,23 +19,14 @@ final class UserController extends AbstractController
         return $this->json($data);
     }
 
-    // Route pour récupérer un utilisateur par son ID
     #[Route('/users/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function getOneUser(UserRepository $ur, int $id): Response
+    public function getOneUser(int $id): Response
     {
-        $user = $ur->find($id);
+        $data = $this->userService->getUserById($id);
 
-        if (!$user) {
+        if (!$data) {
             return $this->json(['error' => 'User not found'], 404);
         }
-
-        $data = [
-            'id' => $user->getId(),
-            'firstname' => $user->getFirstname(),
-            'lastname' => $user->getLastname(),
-            'email' => $user->getEmail(),
-            'role' => $user->getRoles()
-        ];
 
         return $this->json($data);
     }
