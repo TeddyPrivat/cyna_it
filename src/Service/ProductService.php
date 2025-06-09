@@ -42,7 +42,7 @@ class ProductService
         $product->setTitle($data['title']);
         $product->setDescription($data['description']);
         $product->setPrice($data['price']);
-        $product->setImgUrl($data['imgUrl']);
+        $product->setImgUrl($data['imgUrl'] ?? null);
         $product->setStock($data['stock'] ?? 0);
 
         if (!empty($data['categories']) && is_array($data['categories'])) {

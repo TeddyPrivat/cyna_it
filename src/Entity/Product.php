@@ -28,7 +28,7 @@ class Product
     #[Groups(['product:read'])]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['product:read'])]
     private ?string $imgUrl = null;
 
@@ -86,7 +86,7 @@ class Product
         return $this->imgUrl;
     }
 
-    public function setImgUrl(string $imgUrl): static
+    public function setImgUrl(?string $imgUrl): static
     {
         $this->imgUrl = $imgUrl;
 

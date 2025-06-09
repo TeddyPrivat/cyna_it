@@ -42,6 +42,7 @@ class ServiceService
         $service->setTitle($data['title']);
         $service->setDescription($data['description']);
         $service->setPrice($data['price']);
+        $service->setStock($data['stock']);
 
         if (!empty($data['categories']) && is_array($data['categories'])) {
             foreach ($data['categories'] as $categoryId) {
@@ -120,6 +121,8 @@ class ServiceService
             'title' => $service->getTitle(),
             'description' => $service->getDescription(),
             'price' => $service->getPrice(),
+            'stock' => $service->getStock(),
+            'img_url' => $service->getImgUrl(),
             'categories' => $categories,
         ];
     }

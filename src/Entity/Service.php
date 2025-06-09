@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\ServiceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ServiceRepository::class)]
 class Service
@@ -33,6 +36,12 @@ class Service
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     #[Groups(['service:read'])]
     private Collection $categories;
+
+    #[ORM\Column]
+    private ?int $stock = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $img_url = null;
 
     public function __construct()
     {
@@ -100,6 +109,30 @@ class Service
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getImgUrl(): ?string
+    {
+        return $this->img_url;
+    }
+
+    public function setImgUrl(?string $img_url): static
+    {
+        $this->img_url = $img_url;
 
         return $this;
     }
