@@ -28,3 +28,5 @@ migrations
 
 
 /migrations/*
+/config/jwt/private.pem
+/config/jwt/public.pem
