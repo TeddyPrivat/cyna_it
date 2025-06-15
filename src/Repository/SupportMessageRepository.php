@@ -2,29 +2,29 @@
 
 namespace App\Repository;
 
-use App\Entity\Product;
+use App\Entity\SupportMessage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Product>
+ * @extends ServiceEntityRepository<SupportMessage>
  */
-class ProductRepository extends ServiceEntityRepository
+class SupportMessageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Product::class);
+        parent::__construct($registry, SupportMessage::class);
     }
 
     /**
-     * Save a Product entity.
+     * Save a SupportMessage entity.
      *
-     * @param Product $product
+     * @param SupportMessage $sm
      * @param bool $flush Whether to flush the changes immediately
      */
-    public function save(Product $product, bool $flush = false): void
+    public function save(SupportMessage $sm, bool $flush = false): void
     {
-        $this->getEntityManager()->persist($product);
+        $this->getEntityManager()->persist($sm);
 
         if ($flush) {
             $this->getEntityManager()->flush();
@@ -32,17 +32,18 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * Remove a Product entity.
+     * Remove a Service entity.
      *
-     * @param Product $product
+     * @param SupportMessage $sm
      * @param bool $flush Whether to flush the changes immediately
      */
-    public function remove(Product $product, bool $flush = false): void
+    public function remove(SupportMessage $sm, bool $flush = false): void
     {
-        $this->getEntityManager()->remove($product);
+        $this->getEntityManager()->remove($sm);
 
         if ($flush) {
             $this->getEntityManager()->flush();
         }
     }
+
 }

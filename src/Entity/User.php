@@ -4,9 +4,12 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use http\Env\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,9 +40,23 @@ class User
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Command $command = null;
 
+    #[ORM\Column(length: 255)]
+    private array $role = [];
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+//    need update
+    public function eraseCredentials() : void
+    {
+        // vider les données les token JWT
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     public function getFirstname(): ?string
@@ -119,6 +136,13 @@ class User
         return $this->city;
     }
 
+
+    public function setRoles(array $roles): static
+    {
+        return $this->setRole($roles);
+    }
+
+
     public function setCity(?string $city): static
     {
         $this->city = $city;
@@ -139,6 +163,21 @@ class User
         }
 
         $this->command = $command;
+
+        return $this;
+    }
+    public function getRoles(): array
+    {
+        return $this->getRole();
+    }
+    public function getRole(): array
+    {
+        return $this->role;
+    }
+
+    public function setRole(array $role): static
+    {
+        $this->role = $role;
 
         return $this;
     }

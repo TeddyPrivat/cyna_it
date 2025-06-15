@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CommandRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandRepository::class)]
@@ -11,28 +10,41 @@ class Command
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'command', cascade: ['persist', 'remove'])]
+    #[ORM\Column(type: 'integer')]
+    private ?int $commandId = null; // Ajouté
+
+    #[ORM\ManyToOne(inversedBy: 'commands')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $product = null;
+    #[ORM\ManyToOne]
+    private ?Product $product = null;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $service = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $quantityProduct = null;
+    #[ORM\ManyToOne]
+    private ?Service $service = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $quantityService = null;
+    private ?int $quantity = null;
+
+    // Getters & Setters
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCommandId(): ?int
+    {
+        return $this->commandId;
+    }
+
+    public function setCommandId(int $commandId): static
+    {
+        $this->commandId = $commandId;
+        return $this;
     }
 
     public function getUser(): ?User
@@ -43,55 +55,39 @@ class Command
     public function setUser(User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
-    public function getProduct(): ?array
+    public function getProduct(): ?Product
     {
         return $this->product;
     }
 
-    public function setProduct(?array $product): static
+    public function setProduct(?Product $product): static
     {
         $this->product = $product;
-
         return $this;
     }
 
-    public function getService(): ?array
+    public function getService(): ?Service
     {
         return $this->service;
     }
 
-    public function setService(?array $service): static
+    public function setService(?Service $service): static
     {
         $this->service = $service;
-
         return $this;
     }
 
-    public function getQuantityProduct(): ?int
+    public function getQuantity(): ?int
     {
-        return $this->quantityProduct;
+        return $this->quantity;
     }
 
-    public function setQuantityProduct(?int $quantityProduct): static
+    public function setQuantity(?int $quantity): static
     {
-        $this->quantityProduct = $quantityProduct;
-
-        return $this;
-    }
-
-    public function getQuantityService(): ?int
-    {
-        return $this->quantityService;
-    }
-
-    public function setQuantityService(?int $quantityService): static
-    {
-        $this->quantityService = $quantityService;
-
+        $this->quantity = $quantity;
         return $this;
     }
 }

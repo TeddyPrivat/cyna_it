@@ -16,28 +16,33 @@ class ServiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Service::class);
     }
 
-    //    /**
-    //     * @return Service[] Returns an array of Service objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Save a Service entity.
+     *
+     * @param Service $service
+     * @param bool $flush Whether to flush the changes immediately
+     */
+    public function save(Service $service, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($service);
 
-    //    public function findOneBySomeField($value): ?Service
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * Remove a Service entity.
+     *
+     * @param Service $service
+     * @param bool $flush Whether to flush the changes immediately
+     */
+    public function remove(Service $service, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($service);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }
