@@ -8,7 +8,10 @@ use Symfony\Component\Mime\Email;
 
 class EmailService
 {
-    public function __construct(private MailerInterface $mailer) {}
+    public function __construct(
+        private MailerInterface $mailer,
+        private string $mailerFrom
+    ) {}
 
     /**
      * @throws TransportExceptionInterface
@@ -21,6 +24,17 @@ class EmailService
             ->subject($subject)
             ->html("Le test fonctionne bien.");
 
+        $this->mailer->send($email);
+    }
+    public function sendRecoverPasswordMail(string $to, string $subject, string $password): void
+    {
+        $email = (new Email())
+            ->from($this->mailerFrom)
+            ->to($to)
+            ->subject($subject)
+            ->html("
+            Bonjour,\n\nVoici votre nouveau mot de passe : $password\n\nMerci de le modifier après connexion.
+            ");
         $this->mailer->send($email);
     }
 }

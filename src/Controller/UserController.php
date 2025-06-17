@@ -43,6 +43,7 @@ final class UserController extends AbstractController
         if (empty($data['email'])) {
             return $this->json(['error' => 'Email is required'], 400);
         }
+
         $email = $data['email'];
         $user = $this->userService->getUserByEmail($email);
 
@@ -56,17 +57,21 @@ final class UserController extends AbstractController
         }
 
         $newPassword = $result['new_password'];
-
-        try {
-            $emailService->sendMail(
-                "{$user['email']}",
-                "Réinitialisation de votre mot de passe",
-                "Bonjour {$user['firstname']},\n\nVoici votre nouveau mot de passe : $newPassword\n\nMerci de le modifier après connexion."
-            );
-        } catch (\Throwable $e) {
-            return $this->json(['error' => 'Erreur lors de l’envoi du mail', 'details' => $e->getMessage()], 500);
+        if (!filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
+            return $this->json(['error' => 'Adresse email invalide'], 400);
         }
 
-        return $this->json(['message' => 'Password reset successfully']);
+        try {
+            $emailService->sendRecoverPasswordMail(
+                "{$user['email']}",
+                "Mot de passe oubliée",
+                "{$newPassword}"
+
+            );
+        } catch (\Throwable $e) {
+            return $this->json(['error' => sprintf('Error sending email to %s', $user['email']), 'details' => $e->getMessage()], 500);
+        }
+
+        return $this->json(['message' => 'Password reset successfully', 'details' => $newPassword]);
     }
 }

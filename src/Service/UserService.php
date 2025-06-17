@@ -49,7 +49,7 @@ class UserService
     }
     public function getUserByEmail(string $email): ?array
     {
-        $user = $this->userRepository->find($email);
+        $user = $this->userRepository->findOneBy(['email' => $email]);
         if (!$user) {
             return null;
         }
@@ -87,7 +87,6 @@ class UserService
             $this->em->flush();
             return true;
         } catch (\Exception $e) {
-            // Log l’erreur si besoin
             return false;
         }
     }
