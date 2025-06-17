@@ -48,12 +48,6 @@ class Service
         $this->categories = new ArrayCollection();
     }
 
-    #[ORM\Column]
-    private ?int $stock = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $img_url = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -115,30 +109,6 @@ class Service
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
-
-        return $this;
-    }
-
-    public function getStock(): ?int
-    {
-        return $this->stock;
-    }
-
-    public function setStock(int $stock): static
-    {
-        $this->stock = $stock;
-
-        return $this;
-    }
-
-    public function getImgUrl(): ?string
-    {
-        return $this->img_url;
-    }
-
-    public function setImgUrl(?string $img_url): static
-    {
-        $this->img_url = $img_url;
 
         return $this;
     }
