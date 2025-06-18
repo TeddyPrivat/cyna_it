@@ -23,7 +23,6 @@ final class SupportMessageController extends AbstractController
         return $this->json($messages);
     }
 
-    #[IsGranted("ROLE_ADMIN")]
     #[Route('/support/message', name: 'app_add_support_message', methods: ['POST'])]
     public function addSupportMessage(Request $request): JsonResponse
     {
