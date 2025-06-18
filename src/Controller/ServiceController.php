@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api')]
 final class ServiceController extends AbstractController
@@ -20,7 +21,6 @@ final class ServiceController extends AbstractController
         $services = $this->serviceService->getAllServices();
         return $this->json($services);
     }
-
     #[Route('/service/{id}', name: 'app_service', methods: ['GET'])]
     public function getServiceById(int $id): JsonResponse
     {
@@ -33,6 +33,7 @@ final class ServiceController extends AbstractController
         return $this->json($service);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/service', name: 'app_create_service', methods: ['POST'])]
     public function createService(Request $request): JsonResponse
     {
@@ -46,6 +47,7 @@ final class ServiceController extends AbstractController
         return $this->json($service, Response::HTTP_CREATED);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/service/{id}', name: 'app_update_service', methods: ['PUT', 'PATCH'])]
     public function updateService(int $id, Request $request): JsonResponse
     {
@@ -64,6 +66,7 @@ final class ServiceController extends AbstractController
         return $this->json($service);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/service/{id}', name: 'app_delete_service', methods: ['DELETE'])]
     public function deleteService(int $id): JsonResponse
     {

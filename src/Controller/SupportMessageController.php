@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 #[Route('/api')]
 final class SupportMessageController extends AbstractController
 {
@@ -21,6 +23,7 @@ final class SupportMessageController extends AbstractController
         return $this->json($messages);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/support/message', name: 'app_add_support_message', methods: ['POST'])]
     public function addSupportMessage(Request $request): JsonResponse
     {
@@ -37,6 +40,7 @@ final class SupportMessageController extends AbstractController
     /**
      * @throws \Exception
      */
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/support/message/{id}', name: 'app_delete_support_message', methods: ['DELETE'])]
     public function deleteSupportMessage($id): JsonResponse
     {
