@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\SupportMessageService;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ final class SupportMessageController extends AbstractController
 {
     public function  __construct(private readonly SupportMessageService $supportMessageService){ }
 
-    #[Route('/support/message', name: 'app_support_message', methods: ['GET'])]
+    #[Route('/support/message', name: 'app_getAll_support_message', methods: ['GET'])]
     public function getAllSupportMessages(): JsonResponse
     {
         $messages = $this->supportMessageService->getAllSupportMessages();
@@ -31,5 +32,15 @@ final class SupportMessageController extends AbstractController
 
         $product = $this->supportMessageService->addSupportMessage($data);
         return $this->json($product, Response::HTTP_CREATED);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    #[Route('/support/message/{id}', name: 'app_delete_support_message', methods: ['DELETE'])]
+    public function deleteSupportMessage($id): JsonResponse
+    {
+        $this->supportMessageService->deleteSupportMessage($id);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

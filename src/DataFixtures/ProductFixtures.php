@@ -20,7 +20,6 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $product->setImgUrl($faker->imageUrl());
             $product->setStock($faker->randomNumber(2));
             $product->setPrice($faker->randomFloat(2,0,100));
-
             $randomIndex = $faker->numberBetween(0,1);
             $category = $this->getReference(CategoryFixtures::CATEGORY_REFERENCE. $randomIndex, Category::class);
             $product->addCategory($category);

@@ -17,6 +17,7 @@ class ServiceFixtures extends Fixture
             $service->setTitle($faker->jobTitle());
             $service->setDescription($faker->text);
             $service->setPrice($faker->randomFloat(2,0, 100));
+            $service->setStock($faker->randomNumber(2));
             $manager->persist($service);
         }
         $manager->flush();

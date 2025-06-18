@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use http\Env\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -22,7 +21,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
@@ -40,23 +39,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Command $command = null;
 
-    #[ORM\Column(length: 255)]
-    private array $role = [];
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-//    need update
-    public function eraseCredentials() : void
-    {
-        // vider les données les token JWT
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
     }
 
     public function getFirstname(): ?string
@@ -136,13 +124,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->city;
     }
 
-
-    public function setRoles(array $roles): static
-    {
-        return $this->setRole($roles);
-    }
-
-
     public function setCity(?string $city): static
     {
         $this->city = $city;
@@ -157,7 +138,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCommand(Command $command): static
     {
-        // set the owning side of the relation if necessary
         if ($command->getUser() !== $this) {
             $command->setUser($this);
         }
@@ -166,19 +146,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     public function getRoles(): array
     {
-        return $this->getRole();
-    }
-    public function getRole(): array
-    {
-        return $this->role;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function setRole(array $role): static
+    public function setRoles(array $roles): static
     {
-        $this->role = $role;
+        $this->roles = $roles;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
     }
 }

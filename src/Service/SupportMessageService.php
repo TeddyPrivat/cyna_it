@@ -5,9 +5,9 @@ namespace App\Service;
 use App\Entity\SupportMessage;
 use App\Repository\SupportMessageRepository;
 
-class SupportMessageService
+readonly class SupportMessageService
 {
-    public function __construct(private readonly SupportMessageRepository $smr){ }
+    public function __construct(private SupportMessageRepository $smr){ }
 
     public function getAllSupportMessages(): array
     {
@@ -32,12 +32,24 @@ class SupportMessageService
         return $this->serializeSupportMessage($sm);
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function deleteSupportMessage($id): void
+    {
+        $deleteMessage = $this->smr->find($id);
+        if(!$deleteMessage){
+            throw new \Exception("Message de support non trouvé pour l'ID $id.");
+        }
+        $this->smr->remove($deleteMessage, true);
+    }
+
     public function serializeSupportMessage(SupportMessage $supportMessage): array
     {
         return [
             'id' => $supportMessage->getId(),
-            'firstName' => $supportMessage->getFirstName(),
-            'lastName' => $supportMessage->getLastName(),
+            'firstname' => $supportMessage->getFirstName(),
+            'lastname' => $supportMessage->getLastName(),
             'email' => $supportMessage->getEmail(),
             'message' => $supportMessage->getMessage(),
         ];
