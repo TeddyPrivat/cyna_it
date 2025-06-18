@@ -29,11 +29,21 @@ class UserFixtures extends Fixture
             $user->setFirstname($faker->firstName());
             $user->setLastname($faker->lastName());
             $user->setEmail(strtolower($user->getFirstname().".".$user->getLastname().'@hotmail.fr'));
-
+            $user->setAdress($faker->streetAddress());
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
             $manager->persist($user);
         }
+        $user = new User();
+        $password = "123456";
+        $user->setFirstname("Teddy");
+        $user->setLastname("Privat");
+        $user->setEmail("teddyprivat@hotmail.fr");
+        $user->setRoles(["ROLE_ADMIN"]);
+        $user->setAdress($faker->streetAddress());
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
+        $user->setPassword($hashedPassword);
+        $manager->persist($user);
         $manager->flush();
     }
 }

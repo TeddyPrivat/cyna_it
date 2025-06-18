@@ -34,6 +34,7 @@ security:
         - { path: ^/api/signup, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY }
+        # - { path: ^/api, roles: ROLE_ADMIN, methods: [POST,PUT,DELETE]}
 
           # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
