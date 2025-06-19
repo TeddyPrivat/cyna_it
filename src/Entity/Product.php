@@ -20,31 +20,28 @@ class Product
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
     #[Groups(['product:read'])]
+    #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['product:read'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['product:read'])]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $imgUrl = null;
 
-    #[ORM\Column]
     #[Groups(['product:read'])]
+    #[ORM\Column]
     private ?float $price = null;
 
-    #[ORM\Column]
     #[Groups(['product:read'])]
+    #[ORM\Column]
     private ?int $stock = null;
 
-    /**
-     * @var Collection<int, Category>
-     */
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     #[Groups(['product:read'])]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     private Collection $categories;
 
     public function __construct()
@@ -52,78 +49,52 @@ class Product
         $this->categories = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
+    public function getTitle(): ?string { return $this->title; }
 
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
+    public function getDescription(): ?string { return $this->description; }
 
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
-    public function getImgUrl(): ?string
-    {
-        return $this->imgUrl;
-    }
+    public function getImgUrl(): ?string { return $this->imgUrl; }
 
     public function setImgUrl(?string $imgUrl): static
     {
         $this->imgUrl = $imgUrl;
-
         return $this;
     }
 
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
+    public function getPrice(): ?float { return $this->price; }
 
     public function setPrice(float $price): static
     {
         $this->price = $price;
-
         return $this;
     }
 
-    public function getStock(): ?int
-    {
-        return $this->stock;
-    }
+    public function getStock(): ?int { return $this->stock; }
 
     public function setStock(int $stock): static
     {
         $this->stock = $stock;
-
         return $this;
     }
 
     /**
      * @return Collection<int, Category>
      */
-    public function getCategories(): Collection
-    {
-        return $this->categories;
-    }
+    public function getCategories(): Collection { return $this->categories; }
 
     public function addCategory(Category $category): static
     {
@@ -137,7 +108,6 @@ class Product
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
-
         return $this;
     }
 }

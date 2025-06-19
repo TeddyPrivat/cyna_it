@@ -10,6 +10,7 @@ use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class CartService
 {
@@ -18,7 +19,8 @@ class CartService
         private readonly UserRepository $userRepository,
         private readonly ProductRepository $productRepository,
         private readonly ServiceRepository $serviceRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly NormalizerInterface $normalizer    
     ) {}
 
     public function getAllCarts(): array
@@ -35,12 +37,19 @@ class CartService
     public function getCartForUser($user): array
     {
         $cartItems = $this->cartRepository->findBy(['user' => $user]);
-        return array_map(fn($item) => [
-            'id' => $item->getId(),
-            'product' => $item->getProduct(),
-            'service' => $item->getService(),
-            'quantity' => $item->getQuantity(),
-        ], $cartItems);
+
+        return array_map(function ($item) {
+            return [
+                'id' => $item->getId(),
+                'product' => $item->getProduct()
+                    ? $this->normalizer->normalize($item->getProduct(), null, ['groups' => 'product:read'])
+                    : null,
+                'service' => $item->getService()
+                    ? $this->normalizer->normalize($item->getService(), null, ['groups' => 'service:read'])
+                    : null,
+                'quantity' => $item->getQuantity(),
+            ];
+        }, $cartItems);
     }
 
     public function addToCart(int $user_id, array $data): JsonResponse

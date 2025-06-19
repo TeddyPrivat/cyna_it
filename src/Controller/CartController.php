@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\CartService;
+use App\Repository\CartRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +16,7 @@ final class CartController extends AbstractController
 {
     public function __construct(
         private readonly CartService $cartService,
+        private readonly CartRepository $cartRepository,
         private readonly UserRepository $userRepository
     ) {}
 
@@ -32,7 +34,13 @@ final class CartController extends AbstractController
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($this->cartService->getCartForUser($user));
+        return $this->json(
+            $this->cartService->getCartForUser($user),
+            200,
+            [],
+            ['groups' => ['product:read', 'service:read']]
+        );
+
     }
 
     #[Route('/cart/{user_id}', name: 'app_cart_add', methods: ['POST'])]
