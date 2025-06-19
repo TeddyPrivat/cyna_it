@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -101,6 +102,7 @@ class UserService
         }
     }
 
+
     // This method is used to update user data
     public function updateUserData(array $userData): ?User
     {
@@ -143,5 +145,28 @@ class UserService
         } catch (\Exception $e) {
             return null;
         }
+
+    }
+    public function changeRole($id, $role): array
+    {
+        $user = $this->userRepository->find($id);
+        $user->setRoles($role);
+
+        $this->em->persist($user);
+        $this->em->flush();
+        return $this->serializeUser($user);
+    }
+
+    private function serializeUser(User $user): array
+    {
+
+        return [
+            'id' => $user->getId(),
+            'firstname' => $user->getFirstname(),
+            'lastname' => $user->getLastname(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRoles(),
+        ];
+
     }
 }

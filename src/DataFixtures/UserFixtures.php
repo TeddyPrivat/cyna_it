@@ -25,7 +25,7 @@ class UserFixtures extends Fixture
 
         for($i = 0; $i < 5; $i++){
             $user = new User();
-            $plainPassword = $faker->password();
+            $plainPassword = "123456";
             $user->setFirstname($faker->firstName());
             $user->setLastname($faker->lastName());
             $user->setEmail(strtolower($user->getFirstname().".".$user->getLastname().'@hotmail.fr'));
