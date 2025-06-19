@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\UserService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,5 +74,15 @@ final class UserController extends AbstractController
         }
 
         return $this->json(['message' => 'Password reset successfully', 'details' => $newPassword]);
+    }
+    #[Route('/users/role/{id}', name: 'app_put_user', methods: ['PUT'])]
+    public function putUserRole(Request $request, $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return $this->json(['message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
+        }
+        $user = $this->userService->changeRole($id, $data['role']);
+        return $this->json($user);
     }
 }
