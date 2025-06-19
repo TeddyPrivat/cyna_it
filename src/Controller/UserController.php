@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\UserService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,15 +78,27 @@ final class UserController extends AbstractController
     #[Route('/users/{id}', name: 'app_user_update', methods: ['PUT'])]
     public function updateUser(int $id, Request $request): Response
     {
-        // On utilise le service UserService pour mettre à jour l'utilisateur (function updateUserData)
         $data = json_decode($request->getContent(), true);
         if (!$data) {
             return $this->json(['error' => 'Data is empty'], 400);
         }
-        $data['id'] = $id; // Ajout de l'ID à la donnée pour la mise à jour
+
+        $data['id'] = $id;
+
+        // Si on veut changer le rôle uniquement
+        if (isset($data['role']) && count($data) === 2) {
+            $user = $this->userService->changeRole($id, $data['role']);
+            if (!$user) {
+                return $this->json(['error' => 'User not found'], 404);
+            }
+            return $this->json($user);
+        }
+
+        // Sinon, mise à jour générale de l'utilisateur
         $user = $this->userService->updateUserData($data);
         if (!$user) {
             return $this->json(['error' => 'User not found'], 404);
         }
+        return $this->json($user);
     }
-}
+    

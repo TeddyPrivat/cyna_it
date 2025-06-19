@@ -76,6 +76,10 @@ class ServiceService
             $service->setPrice($data['price']);
         }
 
+        if(isset($data['stock'])){
+            $service->setStock($data['stock']);
+        }
+
         if (isset($data['categories']) && is_array($data['categories'])) {
             foreach ($service->getCategories() as $existingCategory) {
                 $service->removeCategory($existingCategory);
