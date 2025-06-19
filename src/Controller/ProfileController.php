@@ -56,6 +56,7 @@ final class ProfileController extends AbstractController
             'adress' => 'setAdress',
             'postal_code' => 'setPostalCode',
             'city' => 'setCity',
+            'roles' => 'setRole',
         ];
 
         foreach ($fields as $field => $setter) {

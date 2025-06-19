@@ -100,4 +100,48 @@ class UserService
             return false;
         }
     }
+
+    // This method is used to update user data
+    public function updateUserData(array $userData): ?User
+    {
+        $id = $userData['id'];
+        $user = $this->userRepository->find($id);
+
+        if (!$user) {
+            return null;
+        }
+
+        // Update user properties
+        if (isset($userData['firstname'])) {
+            $user->setFirstname($userData['firstname']);
+        }
+        if (isset($userData['lastname'])) {
+            $user->setLastname($userData['lastname']);
+        }
+        if (isset($userData['email'])) {
+            $user->setEmail($userData['email']);
+        }
+        if (isset($userData['adress'])) {
+            $user->setAdress($userData['adress']);
+        }
+        if (isset($userData['postalCode'])) {
+            $user->setPostalCode($userData['postalCode']);
+        }
+        if (isset($userData['city'])) {
+            $user->setCity($userData['city']);
+        }
+
+        // If password is provided, hash it and set it
+        if (isset($userData['password']) && !empty($userData['password'])) {
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $userData['password']);
+            $user->setPassword($hashedPassword);
+        }
+
+        try {
+            $this->em->flush();
+            return $user;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

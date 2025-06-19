@@ -74,4 +74,18 @@ final class UserController extends AbstractController
 
         return $this->json(['message' => 'Password reset successfully', 'details' => $newPassword]);
     }
+    #[Route('/users/{id}', name: 'app_user_update', methods: ['PUT'])]
+    public function updateUser(int $id, Request $request): Response
+    {
+        // On utilise le service UserService pour mettre à jour l'utilisateur (function updateUserData)
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return $this->json(['error' => 'Data is empty'], 400);
+        }
+        $data['id'] = $id; // Ajout de l'ID à la donnée pour la mise à jour
+        $user = $this->userService->updateUserData($data);
+        if (!$user) {
+            return $this->json(['error' => 'User not found'], 404);
+        }
+    }
 }
