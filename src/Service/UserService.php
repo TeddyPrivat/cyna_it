@@ -146,7 +146,9 @@ class UserService
             return null;
         }
 
+
     }
+
     public function changeRole($id, $role): array
     {
         $user = $this->userRepository->find($id);
