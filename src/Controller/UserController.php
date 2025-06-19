@@ -85,20 +85,21 @@ final class UserController extends AbstractController
 
         $data['id'] = $id;
 
-        // Si on veut changer le rôle uniquement
-        if (isset($data['role']) && count($data) === 2) {
-            $user = $this->userService->changeRole($id, $data['role']);
-            if (!$user) {
-                return $this->json(['error' => 'User not found'], 404);
-            }
-            return $this->json($user);
-        }
-
         // Sinon, mise à jour générale de l'utilisateur
         $user = $this->userService->updateUserData($data);
         if (!$user) {
             return $this->json(['error' => 'User not found'], 404);
         }
+        return $this->json($user);
+    }
+    #[Route('/users/role/{id}', name: 'app_put_user', methods: ['PUT'])]
+    public function putUserRole(Request $request, $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return $this->json(['message' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
+        }
+        $user = $this->userService->changeRole($id, $data['role']);
         return $this->json($user);
     }
 
