@@ -22,7 +22,7 @@ final class ProductController extends AbstractController
         return $this->json($products);
     }
 
-    #[IsGranted("ROLE_ADMIN")]
+
     #[Route('/product/{id}', name: 'app_product', methods: ['GET'])]
     public function getProductById(int $id): JsonResponse
     {

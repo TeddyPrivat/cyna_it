@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserService
 {
@@ -145,10 +146,9 @@ class UserService
         } catch (\Exception $e) {
             return null;
         }
-
-
     }
 
+    #[IsGranted("ROLE_SUPER_ADMIN")]
     public function changeRole($id, $role): array
     {
         $user = $this->userRepository->find($id);
