@@ -25,7 +25,11 @@ class UserService
                 'id' => $user->getId(),
                 'firstname' => $user->getFirstname(),
                 'lastname' => $user->getLastname(),
-                'email' => $user->getEmail()
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+                'adress' => $user->getAdress(),
+                'postalCode' => $user->getPostalCode(),
+                'city' => $user->getCity(),
             ];
         }
 
@@ -44,7 +48,10 @@ class UserService
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
             'email' => $user->getEmail(),
-            'roles' => $user->getRoles()
+            'roles' => $user->getRoles(),
+            'adress' => $user->getAdress(),
+            'postalCode' => $user->getPostalCode(),
+            'city' => $user->getCity(),
         ];
     }
     public function getUserByEmail(string $email): ?array
@@ -58,7 +65,10 @@ class UserService
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
             'email' => $user->getEmail(),
-            'roles' => $user->getRoles()
+            'roles' => $user->getRoles(),
+            'adress' => $user->getAdress(),
+            'postalCode' => $user->getPostalCode(),
+            'city' => $user->getCity(),
         ];
     }
     public function resetPassword(array $userData): ?array
