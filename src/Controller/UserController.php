@@ -120,13 +120,14 @@ final class UserController extends AbstractController
     }
 
     #[Route('/validate/email', name: 'app_validate_user_email', methods: ['POST'])]
-    public function validateUserEmail(Request $request): JsonResponse
+    public function validateUserEmail(Request $request, EmailService $emailService): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         if (!$data) {
             return $this->json(['error' => 'Data is empty'], 400);
         }
         $email = $data['email'];
+        $id= $data['id'];
         if (!$email){
             return $this->json(['error' => 'Email is required'], 400);
         }
@@ -138,6 +139,12 @@ final class UserController extends AbstractController
         if(!$jwtToken){
             return $this->json(['error' => 'Generating JWT validation token'], 500);
         }
+        try {
+            $emailService->sendValidationLink($email,$jwtToken,$id);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => sprintf('Error sending email to %s', $email), 'details' => $e->getMessage()], 500);
+        }
+
         return $this->json(['token' => $jwtToken]);
     }
 }

@@ -5,11 +5,13 @@ namespace App\Service;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailService
 {
     public function __construct(
         private MailerInterface $mailer,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private string $mailerFrom
     ) {}
 
@@ -37,4 +39,38 @@ class EmailService
             ");
         $this->mailer->send($email);
     }
+
+    public function sendValidationLink(string $email, string $token, int $id): void
+    {
+        try {
+            $url = $this->urlGenerator->generate(
+                'app_validate_user',
+                ['id' => $id, 'token' => $token],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
+            $message = (new Email())
+                ->from('no-reply@monsite.com')
+                ->to($email)
+                ->subject('Validez votre adresse email')
+                ->html("
+                <h2>Bienvenue à Cyna IT</h2>
+                <p>Merci de vous être inscrit. Veuillez cliquer sur le bouton ci-dessous pour confirmer votre adresse email :</p>
+                <p>
+                    <a href=\"$url\" style=\"display:inline-block;padding:10px 20px;background:#007BFF;color:white;text-decoration:none;border-radius:5px;\">
+                        Confirmer mon adresse
+                    </a>
+                </p>
+                <p>Ou copiez-collez ce lien dans votre navigateur :</p>
+                <p><code>$url</code></p>
+                <hr>
+                <small>Ce lien expirera dans 30 minutes.</small>
+            ");
+
+            $this->mailer->send($message);
+        } catch (TransportExceptionInterface $e) {
+            throw new \RuntimeException('Erreur lors de l’envoi de l’email : ' . $e->getMessage());
+        }
+    }
+
 }
