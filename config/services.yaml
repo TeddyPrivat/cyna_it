@@ -31,3 +31,5 @@ services:
     App\Service\EmailService:
         arguments:
             $mailerFrom: '%mailer_from%'
+
+    App\Service\UserService: ~

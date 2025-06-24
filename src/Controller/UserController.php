@@ -103,5 +103,42 @@ final class UserController extends AbstractController
         return $this->json($user);
     }
 
+    #[Route('/validate/user/{id}/{token}', name: 'app_validate_user', methods: ['GET'])]
+    public function validateUser($id, $token): JsonResponse
+    {
+        if (!$token){
+            return $this->json(['error' => 'Missing validation token'], 400);
+        }
+        if (!$id){
+            return $this->json(['error' => 'Missing id'], 400);
+        }
+        $user = $this->userService->getUserById($id);
+        if (!$user) {
+            return $this->json(['error' => 'User not found'], 404);
+        }
+        return $this->userService->validateEmail($user, $token);
+    }
+
+    #[Route('/validate/email', name: 'app_validate_user_email', methods: ['POST'])]
+    public function validateUserEmail(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return $this->json(['error' => 'Data is empty'], 400);
+        }
+        $email = $data['email'];
+        if (!$email){
+            return $this->json(['error' => 'Email is required'], 400);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->json(['error' => 'Adresse email invalide'], 400);
+        }
+        $jwtToken = $this->userService->generateJWTvalidationToken($email);
+
+        if(!$jwtToken){
+            return $this->json(['error' => 'Generating JWT validation token'], 500);
+        }
+        return $this->json(['token' => $jwtToken]);
+    }
 }
 

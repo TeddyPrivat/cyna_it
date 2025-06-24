@@ -8,13 +8,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 
 class UserService
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
+        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly JWTEncoderInterface $jwtEncoder
     ) {}
 
     public function getAllUsersData(): array
@@ -37,24 +41,9 @@ class UserService
 
         return $data;
     }
-    public function getUserById(int $id): ?array
+    public function getUserById(int $id): ?User
     {
-        $user = $this->userRepository->find($id);
-
-        if (!$user) {
-            return null;
-        }
-
-        return [
-            'id' => $user->getId(),
-            'firstname' => $user->getFirstname(),
-            'lastname' => $user->getLastname(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
-            'adress' => $user->getAdress(),
-            'postalCode' => $user->getPostalCode(),
-            'city' => $user->getCity(),
-        ];
+        return $this->em->getRepository(User::class)->find($id);
     }
     public function getUserByEmail(string $email): ?array
     {
@@ -171,4 +160,61 @@ class UserService
         ];
 
     }
+    public function generateJWTvalidationToken(string $email): string
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return '';
+        }
+
+        return $this->jwtManager->create($user);
+    }
+
+    public function validateEmail(User $user, string $token): JsonResponse
+    {
+        $tokenValidation = $this->validateJwtToken($token);
+        if (!$tokenValidation) {
+            return new JsonResponse(['error' => 'INVALID JWT TOKEN'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+        $payload = $this->jwtEncoder->decode($token);
+        $id = $payload['id'];
+        if(!$id){
+            return new JsonResponse(['error' => 'INVALID ID'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+        $newUser = $this->userRepository->find($id);
+        if (!$newUser) {
+            return new JsonResponse(['error' => 'INVALID ID'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+        if ($newUser != $user) {
+            return new JsonResponse(['error' => "USERS AREN'T MATCHING"], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $isVerified = $newUser->isVerified();
+        if($isVerified){
+            return new JsonResponse(['error'=>"This email is already verified"], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+//        set user as is verified
+        $user->setIsVerified(true);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return new JsonResponse(['message' => 'Email is now validate'], 200);
+    }
+    private function validateJwtToken(string $token): bool
+    {
+        try {
+            $payload = $this->jwtEncoder->decode($token);
+
+            if (!isset($payload['exp']) || $payload['exp'] < time()) {
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
 }
