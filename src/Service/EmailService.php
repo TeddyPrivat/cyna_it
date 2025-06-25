@@ -43,11 +43,12 @@ class EmailService
     public function sendValidationLink(string $email, string $token, int $id): void
     {
         try {
-            $url = $this->urlGenerator->generate(
-                'app_validate_user',
-                ['id' => $id, 'token' => $token],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
+//            $url = $this->urlGenerator->generate(
+//                'app_validate_user',
+//                ['id' => $id, 'token' => $token],
+//                UrlGeneratorInterface::ABSOLUTE_URL
+//            );
+            $url = "http://localhost:5173/validate/user/" . $token;
 
             $message = (new Email())
                 ->from('no-reply@monsite.com')
