@@ -11,7 +11,6 @@ class EmailService
 {
     public function __construct(
         private MailerInterface $mailer,
-        private readonly UrlGeneratorInterface $urlGenerator,
         private string $mailerFrom
     ) {}
 

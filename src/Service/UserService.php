@@ -222,7 +222,7 @@ class UserService
 
         $isVerified = $newUser->isVerified();
         if($isVerified){
-            return new JsonResponse(['error'=>"This email is already verified"], JsonResponse::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['error'=>"This email is already verified"], 406);
         }
 
 //        set user as is verified
