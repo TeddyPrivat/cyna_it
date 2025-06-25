@@ -41,28 +41,58 @@ class UserService
 
         return $data;
     }
+    public function createUser(array $data): User|false|string
+    {
+        $firstname = $data['firstname'] ?? null;
+        $lastname = $data['lastname'] ?? null;
+        $email = $data['email'] ?? null;
+        $adress = $data['adress'] ?? null;
+        $password = $data['password'] ?? null;
+        $confirmPassword = $data['confirm_password'] ?? null;
+
+        if (!$firstname || !$lastname || !$email || !$password || !$confirmPassword) {
+            return 'Missing required fields.';
+        }
+
+        if ($password !== $confirmPassword) {
+            return 'Passwords do not match.';
+        }
+
+        $existingUser = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
+        if ($existingUser) {
+            return 'User already exists.';
+        }
+
+        $user = new User();
+        $user->setFirstname($firstname);
+        $user->setLastname($lastname);
+        $user->setEmail($email);
+        $user->setAdress($adress);
+        $user->setRoles(['ROLE_USER']);
+        $user->setIsVerified(false);
+
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
+        $user->setPassword($hashedPassword);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
     public function getUserById(int $id): ?User
     {
         return $this->em->getRepository(User::class)->find($id);
     }
-    public function getUserByEmail(string $email): ?array
+    public function getUserByEmail(string $email): ?User
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
         if (!$user) {
             return null;
         }
-        return [
-            'id' => $user->getId(),
-            'firstname' => $user->getFirstname(),
-            'lastname' => $user->getLastname(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
-            'adress' => $user->getAdress(),
-            'postalCode' => $user->getPostalCode(),
-            'city' => $user->getCity(),
-        ];
+        return $user;
     }
-    public function resetPassword(array $userData): ?array
+    public function resetPassword(User $userData): ?array
     {
         $id = $userData['id'];
         $user = $this->userRepository->find($id);

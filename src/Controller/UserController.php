@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\EmailService;
+use Throwable;
 
 #[Route('/api')]
 final class UserController extends AbstractController
@@ -69,7 +70,7 @@ final class UserController extends AbstractController
                 "{$newPassword}"
 
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->json(['error' => sprintf('Error sending email to %s', $user['email']), 'details' => $e->getMessage()], 500);
         }
 
@@ -141,7 +142,7 @@ final class UserController extends AbstractController
         }
         try {
             $emailService->sendValidationLink($email,$jwtToken,$id);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->json(['error' => sprintf('Error sending email to %s', $email), 'details' => $e->getMessage()], 500);
         }
 

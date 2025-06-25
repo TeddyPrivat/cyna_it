@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\EmailService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,49 +17,36 @@ final class SignUpController extends AbstractController
 {
     #[Route('/signup', name: 'app_signup', methods: ['POST'])]
     public function signUp(
-        Request                     $request,
-        EntityManagerInterface      $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        Request $request,
+        EmailService $emailService,
+        UserService $userService
     ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
         if (!$data) {
             return $this->json(['error' => 'Invalid JSON.'], 400);
         }
 
-        $firstname = $data['firstname'] ?? null;
-        $lastname = $data['lastname'] ?? null;
-        $adress = $data['adress'] ?? null;
-        $email = $data['email'] ?? null;
-        $password = $data['password'] ?? null;
-        $confirmPassword = $data['confirm_password'] ?? null;
+        $result = $userService->createUser($data);
 
-//        if (!$firstname || !$lastname || !$email || !$password || !$confirmPassword) {
-//            return $this->json(['error' => 'Missing required fields.'], 400);
-//        }
-
-        if ($password !== $confirmPassword) {
-            return $this->json(['error' => 'Passwords do not match.'], 400);
+        if (is_string($result)) {
+            // Une erreur s'est produite
+            return $this->json(['error' => $result], 400);
         }
 
-        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-        if ($existingUser) {
-            return $this->json(['error' => 'User already exists. Please log in.'], 409);
+        $user = $result;
+        $email = $user->getEmail();
+
+        $jwtToken = $userService->generateJWTvalidationToken($email);
+        if (!$jwtToken) {
+            return $this->json(['error' => 'Generating JWT validation token'], 500);
         }
 
-        $user = new User();
-        $user->setFirstname($firstname);
-        $user->setLastname($lastname);
-        $user->setEmail($email);
-        $user->setAdress($adress);
-        $user->setRoles(['ROLE_USER']);
-
-        $hashedPassword = $passwordHasher->hashPassword($user, $password);
-        $user->setPassword($hashedPassword);
-
-        $entityManager->persist($user);
-        $entityManager->flush();
+        try {
+            $emailService->sendValidationLink($email, $jwtToken, $user->getId());
+        } catch (\Throwable $e) {
+            return $this->json(['error' => sprintf('Error sending email to %s', $email), 'details' => $e->getMessage()], 500);
+        }
 
         return $this->json([
             'message' => 'User created successfully.',
