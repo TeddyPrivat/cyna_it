@@ -109,7 +109,7 @@ class UserService
         return null;
     }
 
-    private function changePassword(User $user, string $plainPassword): bool
+    public function changePassword(User $user, string $plainPassword): bool
     {
         $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
         $user->setPassword($hashedPassword);
@@ -154,7 +154,7 @@ class UserService
         }
 
         // If password is provided, hash it and set it
-        if (isset($userData['password']) && !empty($userData['password'])) {
+        if (!empty($userData['password'])) {
             $hashedPassword = $this->passwordHasher->hashPassword($user, $userData['password']);
             $user->setPassword($hashedPassword);
         }
@@ -246,5 +246,4 @@ class UserService
             return false;
         }
     }
-
 }

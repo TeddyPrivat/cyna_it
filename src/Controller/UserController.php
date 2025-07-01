@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\EmailService;
 use Throwable;
@@ -148,5 +149,33 @@ final class UserController extends AbstractController
 
         return $this->json(['token' => $jwtToken]);
     }
+
+    #[Route('/changePassword/{id}', name: 'app_change_password', methods: ['PUT'])]
+    public function changePasswordUser(Request $request, $id, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $user = $this->userService->getUserById($id);
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['error' => 'Data is empty'], 400);
+        }
+
+        $password = $data['password'];
+        $newPassword = $data['new_password'];
+        $confirmPassword = $data['confirm_password'];
+
+        if (!$passwordHasher->isPasswordValid($user, $password)) {
+            return $this->json(['message' => 'Ancien mot de passe incorrect.'], 400);
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            return $this->json(['message' => 'Le nouveau mot de passe ne correspond pas à la confirmation.'], 400);
+        }
+
+        $this->userService->changePassword($user, $newPassword);
+
+        return $this->json(['message' => 'Le mot de passe a bien été changé.']);
+    }
+
 }
 
