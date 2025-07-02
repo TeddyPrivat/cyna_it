@@ -67,7 +67,10 @@ class UserService
         $user->setFirstname($firstname);
         $user->setLastname($lastname);
         $user->setEmail($email);
-        $user->setAdress($adress);
+        if ($adress) {
+            $user->setAdress($adress);
+        }
+//        $user->setAdress($adress);
         $user->setRoles(['ROLE_USER']);
         $user->setIsVerified(false);
 
