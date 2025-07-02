@@ -94,7 +94,7 @@ class UserService
     }
     public function resetPassword(User $userData): ?array
     {
-        $id = $userData['id'];
+        $id = $userData->getId();
         $user = $this->userRepository->find($id);
 
         if (!$user) {
